@@ -65,7 +65,9 @@ const HomePage = () => {
           </button>
         </div>
       </header>
-      <h1 className="text-3xl font-semibold mb-8 py-1 text-center">Home</h1>
+      <h1 className="text-3xl font-semibold mb-8 py-1 text-center">
+        {userData && userData.name ? `Welcome ${userData.name}!` : "Welcome"}
+      </h1>
       <main className="flex-grow flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-4">
           <button
