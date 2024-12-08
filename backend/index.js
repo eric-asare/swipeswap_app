@@ -53,19 +53,32 @@ app.get("/api/users/:id", (req, res) => {
     });
 });
 
-app.post("/api/users", (req, res) => {
-  const newUser = new User(req.body);
-  console.log(newUser);
-  newUser
-    .save()
-    .then((item) => {
-      console.log(item);
-      res.status(201).json({ message: "Item added successfully" });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ message: "Server error" });
-    });
+app.post("/api/users", async (req, res) => {
+  try {
+    const { email, name, picture } = req.body;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // Update existing user
+      user.name = name;
+      user.picture = picture;
+      await user.save();
+    } else {
+      // Create new user
+      user = new User({
+        email,
+        name,
+        picture,
+      });
+      await user.save();
+    }
+
+    res.status(200).json({ message: "User data saved successfully", user });
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 app.put("/api/users/:id", (req, res) => {
@@ -174,7 +187,8 @@ const userSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    picture: { type: String },
+    googleId: { type: String, unique: true, sparse: true },
   },
   { timestamps: true }
 );
